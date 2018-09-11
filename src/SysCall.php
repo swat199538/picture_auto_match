@@ -13,4 +13,9 @@ class SysCall
     {
         exec('python ./bin/printScreen.py '.$path, $output, $return);
     }
+
+    public static function clickScreen($x, $y)
+    {
+
+    }
 }

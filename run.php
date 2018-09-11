@@ -8,6 +8,4 @@
 
 require './vendor/autoload.php';
 
-use AutoMatch\SysCall;
-
-SysCall::printScreen(__DIR__ . '\simple.png');
+(new \AutoMatch\App())->run(__DIR__);

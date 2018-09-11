@@ -2,9 +2,9 @@
     "name": "codingfish/automacth",
     "require": {},
     "autoload": {
-        "psr-4":
-        {
+        "psr-4": {
             "AutoMatch\\": "src/"
-        }
+        },
+        "files":["config/config.php"]
     }
 }
