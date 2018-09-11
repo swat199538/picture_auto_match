@@ -1,0 +1,10 @@
+{
+    "name": "codingfish/automacth",
+    "require": {},
+    "autoload": {
+        "psr-4":
+        {
+            "AutoMatch\\": "src/"
+        }
+    }
+}
