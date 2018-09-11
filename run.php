@@ -8,4 +8,8 @@
 
 require './vendor/autoload.php';
 
-(new \AutoMatch\App())->run(__DIR__);
+try{
+    (new \AutoMatch\App())->run(__DIR__);
+} catch (\Exception $e){
+    echo $e->getMessage() . PHP_EOL;
+}

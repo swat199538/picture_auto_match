@@ -31,6 +31,30 @@ class App
         echo TEXT[1] . PHP_EOL ;
     }
 
+    /**
+     * 查找游戏区域
+     *
+     * @param string $file
+     * @throws \Exception
+     */
+    protected function loadGameInfo(string $file):void
+    {
+        //判断图片是否存在
+        if (!file_exists($file)){
+            throw new \Exception(TEXT[2]);
+        }
+
+        //获取图片资源
+        $fullScreen = Image::createFromPng($file);
+
+        //获取图片宽度
+        $fullScreenWidth = Image::width($fullScreen);
+        //获取图片高度
+        $fullScreenHeight = Image::height($fullScreen);
+
+        var_dump([$fullScreenWidth, $fullScreenHeight]);
+    }
+
 
     /**
      * 开始运行
@@ -38,6 +62,8 @@ class App
      * @param string $path 当前文件所在文件夹路径
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function run(string $path):void
     {
@@ -53,7 +79,9 @@ class App
         //截取当前屏幕图像
         SysCall::printScreen($filePath);
 
-        echo '233'.PHP_EOL;
+        //加载游戏信息
+        $this->loadGameInfo($filePath);
+
     }
 
 
