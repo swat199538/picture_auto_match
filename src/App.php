@@ -41,7 +41,7 @@ class App
         echo TEXT[1] . PHP_EOL ;
     }
 
-    protected function findGameAre($gameResource):void
+    protected function findGameAreAndSetStartPoint($gameResource):void
     {
         //获取图片宽度
         $fullScreenWidth = Image::width($gameResource);
@@ -119,8 +119,6 @@ class App
      */
     protected function loadGameInfo(string $file):void
     {
-//        $file = $this->currentDirPath . '/test.png';
-
         //判断图片是否存在
         if (!file_exists($file)){
             throw new \Exception(TEXT[2]);
@@ -130,15 +128,146 @@ class App
         $fullScreen = Image::createFromPng($file);
 
         //获取游戏区域并设置起始坐标点
-        $this->findGameAre($fullScreen);
+
+        $start = time();
+//        $this->findGameAreAndSetStartPoint($fullScreen);
+
+
+        $this->fastFindGameAre($fullScreen);
+        $end = time();
+
+        $times = $end-$start;
+
+        echo '耗时:'.$times.PHP_EOL;
+
+        echo '233'.PHP_EOL;
+        die();
 
         if ($this->startX===false || $this->startY===false){
             throw new \Exception(T_EXIT[4], 4);
         }
 
+        //将游戏图片信息加载到一个二维数组中去
 
     }
 
+    /**
+     * @param $gameResource
+     * @throws \Exception
+     * @return bool
+     */
+    protected function fastFindGameAre($gameResource)
+    {
+        //获取图片宽度
+        $fullScreenWidth = Image::width($gameResource);
+        $fullScreenHeight = Image::height($gameResource);
+
+        //需要扫描的列
+        $needScanWidth = $fullScreenWidth - SKIP_START_COLUMN;
+
+        //已经无法找到游戏区域了
+        if ($needScanWidth < 0){
+            throw new \Exception(T_EXIT[4], 4);
+        }
+
+        //如果全屏和游戏的区域一样大，直接判断中间点颜色
+        if ($needScanWidth == 0){
+            return true;
+        }
+
+        $keyPoint = (int)($needScanWidth / GAME_ARE_WIDTH);
+
+        echo $needScanWidth.' '.GAME_ARE_WIDTH.' '.$keyPoint . PHP_EOL;
+
+        for ($row=SKIP_START_ROW;$row<$fullScreenHeight;$row++){
+
+            for ($scan=0;$scan<$keyPoint;$scan++){
+
+                $gameMiddle = (int)(GAME_ARE_WIDTH/2);
+
+                $pointX = SKIP_START_COLUMN + ($scan*GAME_ARE_WIDTH) + $gameMiddle;
+
+                $lastRgb = Image::colorAt($gameResource, $pointX, $row);
+
+                echo "{$pointX}, $row".PHP_EOL;
+
+                if (Image::colorSimilar(GAME_BACKGROUND_COLOR, $lastRgb, COLOR_LIMIT)){
+
+                    if ($this->findStartAndEnd($gameResource, $pointX, $row, $fullScreenWidth)){
+                        break 2;
+                    }
+
+                }
+
+            }
+        }
+
+        echo "快速定位完毕".PHP_EOL;
+    }
+
+    //查找头尾
+    protected function findStartAndEnd($gameResource, $pointX, $y, $width)
+    {
+
+
+        $left = $pointX -1;
+        $right = $pointX +1;
+
+        $leftCount = 0;
+        $rightCount = 0;
+
+        for ($column=SKIP_START_COLUMN;$column<$width;$column++){
+
+            if ($left > 0){
+                $leftColor = Image::colorAt($gameResource, $left, $y);
+                $leftColor = Image::colorSimilar(GAME_BACKGROUND_COLOR, $leftColor, COLOR_LIMIT);
+            }else{
+                $leftColor = false;
+            }
+
+            if ($right < $width){
+                $rightColor = Image::colorAt($gameResource, $right, $y);
+                $rightColor = Image::colorSimilar(GAME_BACKGROUND_COLOR, $rightColor, COLOR_LIMIT);
+            }else{
+                $rightColor = false;
+            }
+
+
+
+            if ($leftColor){
+                $leftCount++;
+                $left--;
+            }
+
+            if ($rightColor){
+                $rightCount++;
+                $right++;
+            }
+
+            if (!$leftColor && !$rightColor){
+                break;
+            }
+        }
+
+        $continueCount = $leftCount+$rightCount+GAME_ARE_LIMIT+1;
+
+
+        if ($continueCount >= GAME_ARE_WIDTH){
+
+            echo "233".PHP_EOL;
+
+            $game = Image::crop($gameResource, $left, $y, GAME_ARE_WIDTH, GAME_ARE_HEIGHT);
+            Image::savePng($game, $this->currentDirPath . GAME_ARE_IMG);
+
+            $this->startX = $left;
+            $this->startY = $left + GAME_ARE_WIDTH;
+
+            return true;
+        }
+
+        return false;
+
+    }
 
     /**
      * 开始运行
