@@ -166,7 +166,7 @@ class App
         $needScanWidth = $fullScreenWidth - SKIP_START_COLUMN;
 
         //已经无法找到游戏区域了
-        if ($needScanWidth < 0){
+        if ($needScanWidth < GAME_ARE_WIDTH){
             throw new \Exception(T_EXIT[4], 4);
         }
 

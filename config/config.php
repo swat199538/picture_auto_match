@@ -27,8 +27,8 @@ define('FULL_SCREEN_IMG', '/img/fullScreen.png');
 // 游戏区域图片保存位置
 define('GAME_ARE_IMG', '/img/gameare.png');
 // 查找起始坐标跳过点,加速查找起始坐标
-define('SKIP_START_COLUMN', 398);//398
-define('SKIP_START_ROW', 153);//153
+define('SKIP_START_COLUMN', 0);//398
+define('SKIP_START_ROW', 0);//153
 // 游戏区域大小，根据自己的实际游戏窗口大小调整
 define('GAME_ARE_WIDTH', 596);//596
 define('GAME_ARE_HEIGHT', 392);//396
