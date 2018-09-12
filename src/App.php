@@ -251,7 +251,6 @@ class App
 
         $continueCount = $leftCount+$rightCount+GAME_ARE_LIMIT+1;
 
-
         if ($continueCount >= GAME_ARE_WIDTH){
 
             echo "233".PHP_EOL;

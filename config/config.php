@@ -27,14 +27,14 @@ define('FULL_SCREEN_IMG', '/img/fullScreen.png');
 // 游戏区域图片保存位置
 define('GAME_ARE_IMG', '/img/gameare.png');
 // 查找起始坐标跳过点,加速查找起始坐标
-define('SKIP_START_COLUMN', 0);
-define('SKIP_START_ROW', 0);
+define('SKIP_START_COLUMN', 398);//398
+define('SKIP_START_ROW', 153);//153
 // 游戏区域大小，根据自己的实际游戏窗口大小调整
-define('GAME_ARE_WIDTH', 928);//930
-define('GAME_ARE_HEIGHT', 550);//554
+define('GAME_ARE_WIDTH', 596);//596
+define('GAME_ARE_HEIGHT', 392);//396
 //游戏窗口误差
 define('GAME_ARE_LIMIT', 0);
 // 游戏背景颜色RGB，用来查找游戏区域
-define('GAME_BACKGROUND_COLOR', [249, 249, 249]);
+define('GAME_BACKGROUND_COLOR', [48, 76, 112]);
 // 颜色相似误差值
-define('COLOR_LIMIT', 5);
+define('COLOR_LIMIT', 0);
