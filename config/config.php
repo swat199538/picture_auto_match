@@ -13,6 +13,7 @@ define('TEXT', [
     2 => '图片未找到!',
     3 => '找到了游戏图片区域！',
     4 => '无法找到游戏区域',
+    5 => '游戏结束',
 ]);
 
 //是否输出调试信息
@@ -44,3 +45,17 @@ define('GAME_BACKGROUND_COLOR', [48, 76, 112]);
 
 // 颜色相似误差值，查找游戏区域时使用
 define('COLOR_LIMIT', 0);
+
+// 连连看图标大小
+define('GAME_ICON_HEIGHT', 35);
+define('GAME_ICON_WEIGHT', 31);
+
+define('GAME_ICON_WEIGHT_LIMIT', 2);
+define('GAME_ICON_HEIGHT_LIMIT', 2);
+
+//间隔
+define('GAME_ICON_WEIGHT_INTERVAL', 4);
+define('GAME_ICON_HEIGHT_INTERVAL', 4);
+
+define('GAME_ICON_ROW', 11);
+define('GAME_ICON_COLUMN', 19);

@@ -27,6 +27,8 @@ class App
      */
     protected $startY = false;
 
+    protected $gameArray = [];
+
     /**
      *  启动倒计时
      * @return void
@@ -39,6 +41,62 @@ class App
             sleep(1);
         }
         echo TEXT[1] . PHP_EOL ;
+    }
+
+
+    /**
+     * @throws \Exception
+     */
+    protected function createGameModel()
+    {
+        $filename = $this->currentDirPath . './img/gameare1.png';
+
+        if (!file_exists($filename)){
+            throw new \Exception(TEXT[2],  2);
+        }
+
+        $game = Image::createFromPng($filename);
+
+        //切割图片，别存储到一个二维数组中
+        for($row=0; $row < GAME_ICON_ROW; $row++){
+            for ($column=0; $column < GAME_ICON_COLUMN; $column++){
+
+                $x = $column * GAME_ICON_WEIGHT + GAME_ICON_WEIGHT_INTERVAL;
+
+                if ($column == 0){
+                    $x += GAME_ICON_WEIGHT_LIMIT;
+                }
+
+                $y = $row * GAME_ICON_HEIGHT + GAME_ICON_HEIGHT_INTERVAL;
+
+                if ($row == 0){
+                    $y += GAME_ICON_HEIGHT_LIMIT;
+                }
+
+                $icon = Image::crop($game, $x, $y, GAME_ICON_WEIGHT, GAME_ICON_HEIGHT);
+
+                //判断是否是空白图，判断方法，只要中心点是背景颜色(此实现图片过会有BUG)
+                $iconWidth = Image::width($icon);
+                $iconHeight = Image::height($icon);
+                $rgb = Image::colorAt($icon, (int)($iconWidth/2), (int)($iconHeight/2));
+
+                if (Image::colorSimilar(GAME_BACKGROUND_COLOR, $rgb)){
+                    $this->gameArray[$column][$row] = [
+                        'x'=>$x,
+                        'y'=>$y,
+                        'color'=>''
+                    ];
+                } else{
+                    $this->gameArray[$column][$row] = [
+                        'x'=>$x,
+                        'y'=>$y,
+                        'color'=>Image::getData($icon)
+                    ];
+                }
+
+            }
+        }
+
     }
 
     /**
@@ -63,8 +121,6 @@ class App
         if ($this->startX===false || $this->startY===false){
             throw new \Exception(T_EXIT[4], 4);
         }
-
-        //将游戏图片信息加载到一个二维数组中去
 
     }
 
@@ -211,12 +267,20 @@ class App
         //倒计时
         $this->countdown();
 
-        //截取当前屏幕图像
-        SysCall::printScreen($filePath);
+//        //截取当前屏幕图像
+//        SysCall::printScreen($filePath);
+//
+//        //加载游戏信息
+//        $this->loadGameInfo($filePath);
 
-        //加载游戏信息
-        $this->loadGameInfo($filePath);
+        //创建游戏二维数组模型
+        $this->createGameModel();
 
+        $match = new Match($this->gameArray);
+
+        $match->clean();
+
+        echo TEXT[5] . PHP_EOL;
     }
 
 
