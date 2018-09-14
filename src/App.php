@@ -29,6 +29,8 @@ class App
 
     protected $gameArray = [];
 
+    protected $doubleImage = 0;
+
     /**
      *  启动倒计时
      * @return void
@@ -81,21 +83,31 @@ class App
                 $rgb = Image::colorAt($icon, (int)($iconWidth/2), (int)($iconHeight/2));
 
                 if (Image::colorSimilar(GAME_BACKGROUND_COLOR, $rgb)){
-                    $this->gameArray[$column][$row] = [
+                    $this->gameArray[$row][$column] = [
                         'x'=>$x,
                         'y'=>$y,
-                        'color'=>''
+                        'color'=>'',
+                        'icon'=>$icon
                     ];
                 } else{
-                    $this->gameArray[$column][$row] = [
+
+                    $filename = $this->currentDirPath . '/img/'.$this->doubleImage.'.png';
+
+                    Image::savePng($icon, $filename);
+
+                    $this->gameArray[$row][$column] = [
                         'x'=>$x,
                         'y'=>$y,
-                        'color'=>Image::getData($icon)
+                        'color'=>Image::getData($icon),
+                        'icon'=>$icon
                     ];
+                    $this->doubleImage++;
                 }
 
             }
         }
+
+//        $this->doubleImage = $this->doubleImage / 2;
 
     }
 
@@ -276,9 +288,14 @@ class App
         //创建游戏二维数组模型
         $this->createGameModel();
 
-        $match = new Match($this->gameArray);
+        var_dump($this->doubleImage);
 
-        $match->clean();
+        die();
+
+        //自动匹配图片
+        $match = new Match($this->gameArray);
+        $match->setStartCoordinate($this->startX, $this->startY)
+            ->clean();
 
         echo TEXT[5] . PHP_EOL;
     }

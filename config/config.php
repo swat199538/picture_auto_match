@@ -21,8 +21,8 @@ define('DEBUG', true);
 define('FIND_GAME_ARE_INFO', '/findare.txt');
 
 
-// 开始执行等待使劲按
-define('SUSPEND_TIME', 3);
+// 开始执行等待时间
+define('SUSPEND_TIME', 0);
 
 // 全屏图片保存位置
 define('FULL_SCREEN_IMG', '/img/fullScreen.png');
@@ -49,13 +49,17 @@ define('COLOR_LIMIT', 0);
 // 连连看图标大小
 define('GAME_ICON_HEIGHT', 35);
 define('GAME_ICON_WEIGHT', 31);
-
+//起点坐标与左上角第一个图片X误差值
 define('GAME_ICON_WEIGHT_LIMIT', 2);
+//起点坐标与左上角第一个图片Y误差值
 define('GAME_ICON_HEIGHT_LIMIT', 2);
 
-//间隔
+//游戏图片列间隔
 define('GAME_ICON_WEIGHT_INTERVAL', 4);
+//游戏图片行间隔
 define('GAME_ICON_HEIGHT_INTERVAL', 4);
 
+//有几行游戏图片
 define('GAME_ICON_ROW', 11);
+//有几列游戏图片
 define('GAME_ICON_COLUMN', 19);
