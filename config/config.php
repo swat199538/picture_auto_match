@@ -66,3 +66,5 @@ define('GAME_ICON_ROW', 11);
 define('GAME_ICON_COLUMN', 19);
 //判读空白图片阈值
 define('IS_EMPTY_COLOR', 1);
+//图片相似误差值
+define('PICTURE_SIMILAR', 2);

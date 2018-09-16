@@ -305,6 +305,7 @@ class App
         $match = new Match($this->gameArray);
         $match->setStartCoordinate($this->startX, $this->startY)
             ->setCoupleCount($this->doubleImage)
+            ->setGameSize(GAME_ICON_ROW, GAME_ICON_COLUMN)
             ->clean();
 
         echo TEXT[5] . PHP_EOL;
