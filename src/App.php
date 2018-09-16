@@ -27,6 +27,10 @@ class App
      */
     protected $startY = false;
 
+    protected $gameArray = [];
+
+    protected $doubleImage = 0;
+
     /**
      *  启动倒计时
      * @return void
@@ -41,73 +45,69 @@ class App
         echo TEXT[1] . PHP_EOL ;
     }
 
-    protected function findGameAreAndSetStartPoint($gameResource):void
+
+    /**
+     * @throws \Exception
+     */
+    protected function createGameModel()
     {
-        //获取图片宽度
-        $fullScreenWidth = Image::width($gameResource);
-        //获取图片高度
-        $fullScreenHeight = Image::height($gameResource);
+        $filename = $this->currentDirPath . './img/gameare1.png';
 
-        //查找起始坐标点
-        //遍历行
-        for($row=SKIP_START_ROW; $row < $fullScreenHeight; $row++){
-            //连续一行颜色的数量
-            $continueColorCount = 0;
+        if (!file_exists($filename)){
+            throw new \Exception(TEXT[2],  2);
+        }
 
-            //遍历列
-            for ($column=SKIP_START_COLUMN; $column < $fullScreenWidth; $column++){
-                // $column是x坐标，$row是y坐标，获取当前坐标颜色
-                $lastRgb = Image::colorAt($gameResource, $column, $row);
+        $game = Image::createFromPng($filename);
 
-                // 判断当前颜色是否和游戏背景颜色相似
-                if ($result = Image::colorSimilar(GAME_BACKGROUND_COLOR, $lastRgb, COLOR_LIMIT)){
+        //切割图片，别存储到一个二维数组中
+        for($row=0; $row < GAME_ICON_ROW; $row++){
+            for ($column=0; $column < GAME_ICON_COLUMN; $column++){
 
-                    $continueColorCount++;
+                $x = $column * GAME_ICON_WEIGHT + GAME_ICON_WEIGHT_INTERVAL;
 
-                    //找到了起始坐标点
-                    if ($continueColorCount >= GAME_ARE_WIDTH - GAME_ARE_LIMIT){
+                if ($column == 0){
+                    $x += GAME_ICON_WEIGHT_LIMIT;
+                }
 
-                        //得到起始X点
-                        $startX = $column - GAME_ARE_WIDTH;
+                $y = $row * GAME_ICON_HEIGHT + GAME_ICON_HEIGHT_INTERVAL;
 
-                        //裁剪游戏区域
-                        $gameAre = Image::crop($gameResource, $startX, $row, GAME_ARE_WIDTH, GAME_ARE_HEIGHT);
+                if ($row == 0){
+                    $y += GAME_ICON_HEIGHT_LIMIT;
+                }
 
-                        //保存游戏区域图片
-                        Image::savePng($gameAre, $this->currentDirPath . GAME_ARE_IMG);
+                $icon = Image::crop($game, $x, $y, GAME_ICON_WEIGHT, GAME_ICON_HEIGHT);
 
-                        //设置起始X点
-                        $this->startX = $startX;
+                //判断是否是空白图，判断方法，只要中心点是背景颜色(此实现图片过会有BUG)
+                $iconWidth = Image::width($icon);
+                $iconHeight = Image::height($icon);
+                $rgb = Image::colorAt($icon, (int)($iconWidth/2), (int)($iconHeight/2));
 
-                        //设置起始Y点
-                        $this->startY = $row;
-
-                        echo TEXT[3] . PHP_EOL;
-
-                        break 2;
-                    }
-
+                if (Image::colorSimilar(GAME_BACKGROUND_COLOR, $rgb)){
+                    $this->gameArray[$row][$column] = [
+                        'x'=>$x,
+                        'y'=>$y,
+                        'color'=>'',
+                        'icon'=>$icon
+                    ];
                 } else{
 
-                    //如果剩余宽度小于游戏窗口宽度了不用查找这一行了
-                    if ($fullScreenWidth - $column < GAME_ARE_WIDTH){
-                        break;
-                    }
+                    $filename = $this->currentDirPath . '/img/'.$this->doubleImage.'.png';
 
-                    $continueColorCount = 0;
+                    Image::savePng($icon, $filename);
+
+                    $this->gameArray[$row][$column] = [
+                        'x'=>$x,
+                        'y'=>$y,
+                        'color'=>Image::getData($icon),
+                        'icon'=>$icon
+                    ];
+                    $this->doubleImage++;
                 }
-
-                if (DEBUG){
-                    echo $continueColorCount . PHP_EOL;
-                    $content = $column.' '. $row.' '.$lastRgb[0].' '.$lastRgb[1].' '.$lastRgb[2].PHP_EOL;
-                    file_put_contents($this->currentDirPath.FIND_GAME_ARE_INFO, $content, FILE_APPEND);
-                }
-
 
             }
         }
 
-        echo "{$this->startX},{$this->startY}".PHP_EOL;
+//        $this->doubleImage = $this->doubleImage / 2;
 
     }
 
@@ -128,35 +128,20 @@ class App
         $fullScreen = Image::createFromPng($file);
 
         //获取游戏区域并设置起始坐标点
-
-        $start = time();
-//        $this->findGameAreAndSetStartPoint($fullScreen);
-
-
         $this->fastFindGameAre($fullScreen);
-        $end = time();
-
-        $times = $end-$start;
-
-        echo '耗时:'.$times.PHP_EOL;
-
-        echo '233'.PHP_EOL;
-        die();
 
         if ($this->startX===false || $this->startY===false){
             throw new \Exception(T_EXIT[4], 4);
         }
-
-        //将游戏图片信息加载到一个二维数组中去
 
     }
 
     /**
      * @param $gameResource
      * @throws \Exception
-     * @return bool
+     * @return void
      */
-    protected function fastFindGameAre($gameResource)
+    protected function fastFindGameAre($gameResource):void
     {
         //获取图片宽度
         $fullScreenWidth = Image::width($gameResource);
@@ -171,28 +156,30 @@ class App
         }
 
         //如果全屏和游戏的区域一样大，直接判断中间点颜色
-        if ($needScanWidth == 0){
-            return true;
-        }
+//        if ($needScanWidth == 0){
+//            //todo:实现中间点查找，基本不会出现这种情况，但还是要做。
+//        }
 
+        //计算出存在的几个关键列
         $keyPoint = (int)($needScanWidth / GAME_ARE_WIDTH);
 
-        echo $needScanWidth.' '.GAME_ARE_WIDTH.' '.$keyPoint . PHP_EOL;
-
+        //循环行
         for ($row=SKIP_START_ROW;$row<$fullScreenHeight;$row++){
 
+            //循环关键列
             for ($scan=0;$scan<$keyPoint;$scan++){
 
+                //计算关键点在屏幕的X坐标
                 $gameMiddle = (int)(GAME_ARE_WIDTH/2);
-
                 $pointX = SKIP_START_COLUMN + ($scan*GAME_ARE_WIDTH) + $gameMiddle;
 
+                //获取关键点坐标的颜色
                 $lastRgb = Image::colorAt($gameResource, $pointX, $row);
 
-                echo "{$pointX}, $row".PHP_EOL;
-
+                //判断关键点颜色是否和背景色相同
                 if (Image::colorSimilar(GAME_BACKGROUND_COLOR, $lastRgb, COLOR_LIMIT)){
 
+                    //从关键点同时往左右两端查找相同颜色，如果宽度和游戏区域宽度相同，即找到游戏区域
                     if ($this->findStartAndEnd($gameResource, $pointX, $row, $fullScreenWidth)){
                         break 2;
                     }
@@ -201,12 +188,18 @@ class App
 
             }
         }
-
-        echo "快速定位完毕".PHP_EOL;
     }
 
-    //查找头尾
-    protected function findStartAndEnd($gameResource, $pointX, $y, $width)
+
+    /**
+     * 查找头尾,如过找到游戏区域设置起始坐标
+     * @param $gameResource
+     * @param $pointX
+     * @param $y
+     * @param $width
+     * @return bool
+     */
+    protected function findStartAndEnd($gameResource, $pointX, $y, $width):bool
     {
 
 
@@ -253,13 +246,11 @@ class App
 
         if ($continueCount >= GAME_ARE_WIDTH){
 
-            echo "233".PHP_EOL;
-
             $game = Image::crop($gameResource, $left, $y, GAME_ARE_WIDTH, GAME_ARE_HEIGHT);
             Image::savePng($game, $this->currentDirPath . GAME_ARE_IMG);
 
             $this->startX = $left;
-            $this->startY = $left + GAME_ARE_WIDTH;
+            $this->startY = $y;
 
             return true;
         }
@@ -288,12 +279,25 @@ class App
         //倒计时
         $this->countdown();
 
-        //截取当前屏幕图像
-        SysCall::printScreen($filePath);
+//        //截取当前屏幕图像
+//        SysCall::printScreen($filePath);
+//
+//        //加载游戏信息
+//        $this->loadGameInfo($filePath);
 
-        //加载游戏信息
-        $this->loadGameInfo($filePath);
+        //创建游戏二维数组模型
+        $this->createGameModel();
 
+        var_dump($this->doubleImage);
+
+        die();
+
+        //自动匹配图片
+        $match = new Match($this->gameArray);
+        $match->setStartCoordinate($this->startX, $this->startY)
+            ->clean();
+
+        echo TEXT[5] . PHP_EOL;
     }
 
 

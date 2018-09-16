@@ -100,7 +100,7 @@ class Image
     }
 
     /**
-     * 讲图片保存为PNG
+     * 将图片保存为PNG
      * @param $img
      * @param $filename
      * @return bool
@@ -110,5 +110,33 @@ class Image
         return imagepng($img, $filename);
     }
 
+    /**
+     * 销毁图片资源
+     * @param $img
+     * @return bool
+     */
+    public static function destroy($img)
+    {
+        return imagedestroy($img);
+    }
+
+    /**
+     * 获取图像资源
+     * @param $img
+     * @return string
+     */
+    public static function getData($img)
+    {
+        ob_start();
+        imagepng($img);
+        $data = ob_get_contents();
+        ob_end_clean();
+        return $data;
+    }
+
+    public static function outline($img, $x1, $y1, $x2, $y2, $color=255331)
+    {
+        imagerectangle($img, $x1, $y1, $x2, $y2, $color);
+    }
 
 }
