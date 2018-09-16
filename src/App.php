@@ -51,7 +51,7 @@ class App
      */
     protected function createGameModel()
     {
-        $filename = $this->currentDirPath . './img/gameare1.png';
+        $filename = $this->currentDirPath . GAME_ARE_IMG;
 
         if (!file_exists($filename)){
             throw new \Exception(TEXT[2],  2);
@@ -80,9 +80,13 @@ class App
                 //判断是否是空白图，判断方法，只要中心点是背景颜色(此实现图片过会有BUG)
                 $iconWidth = Image::width($icon);
                 $iconHeight = Image::height($icon);
+
                 $rgb = Image::colorAt($icon, (int)($iconWidth/2), (int)($iconHeight/2));
 
-                if (Image::colorSimilar(GAME_BACKGROUND_COLOR, $rgb)){
+                $rgb2 = Image::colorAt($icon, (int)($iconWidth/2 - IS_EMPTY_COLOR), (int)($iconHeight/2 - IS_EMPTY_COLOR));
+
+                if (Image::colorSimilar(GAME_BACKGROUND_COLOR, $rgb) && Image::colorSimilar(GAME_BACKGROUND_COLOR, $rgb2)){
+
                     $this->gameArray[$row][$column] = [
                         'x'=>$x,
                         'y'=>$y,
@@ -90,6 +94,8 @@ class App
                         'icon'=>$icon
                     ];
                 } else{
+
+                    $this->doubleImage++;
 
                     $filename = $this->currentDirPath . '/img/'.$this->doubleImage.'.png';
 
@@ -101,13 +107,20 @@ class App
                         'color'=>Image::getData($icon),
                         'icon'=>$icon
                     ];
-                    $this->doubleImage++;
+
                 }
 
             }
         }
 
-//        $this->doubleImage = $this->doubleImage / 2;
+
+        $coupleCount = $this->doubleImage % 2;
+
+        $this->doubleImage = $this->doubleImage / 2 ;
+
+        if ($coupleCount != 0){
+            echo TEXT[6] . $this->doubleImage . PHP_EOL;
+        }
 
     }
 
@@ -279,22 +292,19 @@ class App
         //倒计时
         $this->countdown();
 
-//        //截取当前屏幕图像
-//        SysCall::printScreen($filePath);
-//
-//        //加载游戏信息
-//        $this->loadGameInfo($filePath);
+        //截取当前屏幕图像
+        SysCall::printScreen($filePath);
+
+        //加载游戏信息
+        $this->loadGameInfo($filePath);
 
         //创建游戏二维数组模型
         $this->createGameModel();
 
-        var_dump($this->doubleImage);
-
-        die();
-
         //自动匹配图片
         $match = new Match($this->gameArray);
         $match->setStartCoordinate($this->startX, $this->startY)
+            ->setCoupleCount($this->doubleImage)
             ->clean();
 
         echo TEXT[5] . PHP_EOL;

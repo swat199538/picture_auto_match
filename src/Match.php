@@ -18,6 +18,8 @@ class Match
 
     private $startY = 0;
 
+    private $coupleCount = 0;
+
     protected $matchOne = [
         'x'=>'',
         'y'=>''
@@ -35,6 +37,8 @@ class Match
 
     public function clean()
     {
+        var_dump($this->coupleCount);
+        die();
         foreach ($this->gameArray as $row => $columnInfo){
             foreach ($columnInfo as $column => $pictureInfo){
 
@@ -43,14 +47,6 @@ class Match
                 if ($color == ''){
                     continue;
                 }
-
-                var_dump($this->gameArray[$column]);
-                var_dump([
-                    count($this->gameArray[$row]),
-                    count($this->gameArray[$row][$column])
-                ]);
-
-                die();
 
             }
         }
@@ -70,6 +66,16 @@ class Match
         return $this;
     }
 
+    /**
+     * 设置图片对数
+     * @param $number
+     * @return $this
+     */
+    public function setCoupleCount($number)
+    {
+        $this->coupleCount = $number;
 
+        return $this;
+    }
 
 }

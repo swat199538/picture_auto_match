@@ -14,6 +14,7 @@ define('TEXT', [
     3 => '找到了游戏图片区域！',
     4 => '无法找到游戏区域',
     5 => '游戏结束',
+    6 => '游戏不是偶数对对数为:',
 ]);
 
 //是否输出调试信息
@@ -63,3 +64,5 @@ define('GAME_ICON_HEIGHT_INTERVAL', 4);
 define('GAME_ICON_ROW', 11);
 //有几列游戏图片
 define('GAME_ICON_COLUMN', 19);
+//判读空白图片阈值
+define('IS_EMPTY_COLOR', 1);
