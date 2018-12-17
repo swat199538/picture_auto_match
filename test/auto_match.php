@@ -10,18 +10,18 @@ class testGame
 {
 
     private $chessBorad = [
-        [0, 0, 0, 0, 2, 6, 6, 0, 0, 0, 2, 0],
+        [1, 4, 0, 0, 0, 5, 8, 8, 5, 0, 0, 0],
+        [0, 4, 0, 0, 0, 3, 5, 5, 3, 0, 0, 0],
+        [0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0],
+        [1, 7, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0],
+        [0, 7, 0, 0, 6, 0, 6, 0, 6, 0, 0, 0],
+        [0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0],
+        [0, 8, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0],
-        [0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ];
 
@@ -44,20 +44,7 @@ class testGame
                 $result = $this->directRight($x, $y, $nowPoint);
                 if (is_array($result)){
                     $this->chessBorad[$y][$x] = 0;
-                    echo "{$x},{$y} 清零".PHP_EOL;
                     $this->chessBorad[$result[1]][$result[0]] = 0;
-                    echo "{$result[0]},{$result[1]} 清零".PHP_EOL;
-                    $this->show();
-                    continue;
-                }
-
-                //清除左边
-                $result = $this->directLeft($x, $y, $nowPoint);
-                if (is_array($result)){
-                    $this->chessBorad[$y][$x] = 0;
-                    echo "{$x},{$y} 清零".PHP_EOL;
-                    $this->chessBorad[$result[1]][$result[0]] = 0;
-                    echo "{$result[0]},{$result[1]} 清零".PHP_EOL;
                     $this->show();
                     continue;
                 }
@@ -66,9 +53,25 @@ class testGame
                 $result = $this->directDown($x, $y, $nowPoint);
                 if (is_array($result)){
                     $this->chessBorad[$y][$x] = 0;
-                    echo "{$x},{$y} 清零".PHP_EOL;
                     $this->chessBorad[$result[1]][$result[0]] = 0;
-                    echo "{$result[0]},{$result[1]} 清零".PHP_EOL;
+                    $this->show();
+                    continue;
+                }
+
+                //清除左边
+                $result = $this->directLeft($x, $y, $nowPoint);
+                if (is_array($result)){
+                    $this->chessBorad[$y][$x] = 0;
+                    $this->chessBorad[$result[1]][$result[0]] = 0;
+                    $this->show();
+                    continue;
+                }
+
+                //清除上边
+                $result = $this->directUp($x, $y, $nowPoint);
+                if (is_array($result)){
+                    $this->chessBorad[$y][$x] = 0;
+                    $this->chessBorad[$result[1]][$result[0]] = 0;
                     $this->show();
                     continue;
                 }
@@ -95,7 +98,7 @@ class testGame
 
             //不为空判断是否相等
             if ($nowPointValue == $value){
-                echo "值{$value}匹配到相同坐标:{$x},{$y}-{$nowX},{$y}" . PHP_EOL;
+//                echo "值{$value}匹配到相同坐标:{$x},{$y}-{$nowX},{$y}" . PHP_EOL;
                 return [$nowX, $y];
             }
 
@@ -103,8 +106,6 @@ class testGame
             if ($y == 0 || $y == 11){
                 continue;
             }
-
-            echo "没有 ------" . PHP_EOL;
 
             return false;
         }
@@ -115,7 +116,7 @@ class testGame
     //左直连
     private function directLeft($x, $y, $value)
     {
-        for ($nowX = $x - 1; $x < 0; $x--){
+        for ($nowX = $x - 1; $nowX >= 0; $nowX--){
             //左边一位值
             $nowPointValue = $this->chessBorad[$y][$nowX];
 
@@ -126,7 +127,7 @@ class testGame
 
             //不为空判断是否相等
             if ($nowPointValue == $value){
-                echo "值{$value}匹配到相同坐标:{$x},{$y}-{$nowX},{$y}" . PHP_EOL;
+//                echo "值{$value}匹配到相同坐标:{$x},{$y}-{$nowX},{$y}" . PHP_EOL;
                 return [$nowX, $y];
             }
 
@@ -134,8 +135,6 @@ class testGame
             if ($y == 0 || $y == 11){
                 continue;
             }
-
-            echo "没有 ------" . PHP_EOL;
 
             return false;
 
@@ -147,10 +146,55 @@ class testGame
     private function directDown($x, $y, $value)
     {
         for ($nowY = $y+1; $nowY < 12; $nowY++){
+            $nowPointValue = $this->chessBorad[$nowY][$x];
 
+            //为空
+            if ($nowPointValue == 0){
+                continue;
+            }
+
+            //不为空判断是否相等
+            if ($nowPointValue == $value){
+                return [$x, $nowY];
+            }
+
+            //判断是否上下边界，是继续往右判断，不是终止判断
+            if ($x == 0 || $x == 11){
+                continue;
+            }
+
+            return false;
         }
+
+        return false;
     }
 
+    private function directUp($x, $y, $value)
+    {
+        for ($nowY = $y-1; $nowY >= 0; $nowY--){
+
+            $nowPointValue = $this->chessBorad[$nowY][$x];
+
+            if ($nowPointValue == 0){
+                continue;
+            }
+
+            //不为空判断是否相等
+            if ($nowPointValue == $value){
+                return [$x, $nowY];
+            }
+
+            //判断是否上下边界，是继续往右判断，不是终止判断
+            if ($x == 0 || $x == 11){
+                continue;
+            }
+
+            return false;
+
+        }
+
+        return false;
+    }
 
     //匹配相同字符并显示
     private function show()
